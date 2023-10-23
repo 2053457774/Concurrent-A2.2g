@@ -5,6 +5,7 @@ public class Driver extends Person {
 	
 	public Driver(String driverName, int maxSleep)
 	{
+		super(driverName,maxSleep);
 	}
 	
 	/**
@@ -16,6 +17,9 @@ public class Driver extends Person {
 	 */
 	public void pickUpPassenger(Passenger newPassenger)
 	{
+		curPassenger = newPassenger;
+		//sleep while picking up passenger
+		Thread.sleep(new Random().nextInt(0,this.maxSleep));
 	}
 
 	/**
@@ -25,6 +29,8 @@ public class Driver extends Person {
 	 * @throws InterruptedException
 	 */
 	public void driveToDestination() {
+		int travelTime = curPassenger.getTravelTime();
+		Thread.sleep(travelTime);
 	}
 	
 }
