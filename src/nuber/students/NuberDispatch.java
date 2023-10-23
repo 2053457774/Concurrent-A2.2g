@@ -2,6 +2,9 @@ package nuber.students;
 
 import java.util.HashMap;
 import java.util.concurrent.Future;
+import java.util.Map;
+import java.util.Queue;
+import java.util.LinkedList;
 
 /**
  * The core Dispatch class that instantiates and manages everything for Nuber
@@ -27,6 +30,14 @@ public class NuberDispatch {
 	 */
 	public NuberDispatch(HashMap<String, Integer> regionInfo, boolean logEvents)
 	{
+		this.regionInfo = regionInfo;
+		regionTable = new HashMap<>();
+		for(Map.Entry<String, Integer> entry : regionInfo.entrySet()){
+			String regionName = entry.getKey();
+			int maxSimultaneousJobs = entry.getValue();
+			NuberRegion region = new NuberRegion(this,regionName,maxSimultaneousJobs);
+			regionTable.put(regionName,region);
+		}
 	}
 	
 	/**
