@@ -38,6 +38,8 @@ public class NuberDispatch {
 			NuberRegion region = new NuberRegion(this,regionName,maxSimultaneousJobs);
 			regionTable.put(regionName,region);
 		}
+		idleDrivers = new LinkedList<>();
+		this.logEvents = logEvents;
 	}
 	
 	/**
@@ -50,6 +52,9 @@ public class NuberDispatch {
 	 */
 	public boolean addDriver(Driver newDriver)
 	{
+		boolean flag = true;
+		flag = idleDrivers.offer(newDriver);
+		return flag;
 	}
 	
 	/**
@@ -61,6 +66,9 @@ public class NuberDispatch {
 	 */
 	public Driver getDriver()
 	{
+		Driver driver = null;
+		driver = driver =  idleDrivers.poll();
+		return driver;
 	}
 
 	/**
