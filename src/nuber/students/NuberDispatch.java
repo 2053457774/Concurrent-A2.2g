@@ -51,12 +51,12 @@ public class NuberDispatch {
 			NuberRegion region = new NuberRegion(this,regionName,maxSimultaneousJobs);
 			regionTable.put(regionName,region);
 		}
-		idleDrivers = new LinkedList<>();
+		idleDrivers = new LinkedList<>();// Initialize a LinkedList to store idle drivers
+
 		lock = new ReentrantLock();
-		producerCondition = lock.newCondition();
-		consumerCondition = lock.newCondition();
+		producerCondition = lock.newCondition();// Initialize a Condition object for the producer
+		consumerCondition = lock.newCondition();// Initialize a Condition object for the consumer
 		AwaitingBooks = new AtomicLong(0);
-		
 		this.logEvents = logEvents;
 	}
 	
@@ -72,10 +72,8 @@ public class NuberDispatch {
 	{
 		lock.lock();
 		boolean flag = true;
-		flag = idleDrivers.offer(newDriver);
-
-		// Signal the consumer that an item is available
-		consumerCondition.signal();
+		flag = idleDrivers.offer(newDriver);// Add the new driver to the idleDrivers queue and update the flag based on the success of the operation
+		consumerCondition.signal();// Signal the consumer that an item is available
 		lock.unlock();
 		return flag;
 	}
@@ -90,19 +88,20 @@ public class NuberDispatch {
 	public Driver getDriver()
 	{
 		Driver driver = null;
-		lock.lock();
+		lock.lock();// Acquire the lock to ensure thread safety
 		try {
-			AwaitingBooks.getAndIncrement();
+			AwaitingBooks.getAndIncrement();// Increase the count of awaiting books
 			while (idleDrivers.isEmpty()) {
-				consumerCondition.await();
+				consumerCondition.await(); //Wait until there are available idle drivers
 			}
 			// Consume an item from the buffer
-			AwaitingBooks.getAndDecrement();
+			AwaitingBooks.getAndDecrement();// Retrieve a driver from the pool of idle drivers
 			driver =  idleDrivers.poll();
 			// Signal the producer that there is space in the buffer
-		}catch(InterruptedException e){}
+		}catch(InterruptedException e){}//Handle any interuption that might occur
+		 during the awaiting process
 		finally {
-			lock.unlock();
+			lock.unlock();// Release the lock to allow other threads to access the method
 		}
 		return driver;
 	}
@@ -135,8 +134,8 @@ public class NuberDispatch {
 	 * @return returns a Future<BookingResult> object
 	 */
 	public Future<BookingResult> bookPassenger(Passenger passenger, String region) {
+		//obtain the region and mak booking
 		NuberRegion givenRegion = regionTable.get(region);
-//		System.out.println(NuberDispatch);
 		return givenRegion.bookPassenger(passenger);
 	}
 
@@ -156,6 +155,7 @@ public class NuberDispatch {
 	 * Tells all regions to finish existing bookings already allocated, and stop accepting new bookings
 	 */
 	public void shutdown() {
+		//shutdown all threadpools
 		for (var region : regionTable.values()) {
 			region.shutdown();
 		}

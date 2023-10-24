@@ -41,7 +41,7 @@ public class NuberRegion {
 		this.dispatch = dispatch;
 		this.regionName = regionName;
 		this.maxSimultaneousJobs = maxSimultaneousJobs;
-
+		//Create a new fixed thread pool executor with the maximum simultaneous jobs as the pool size
 		this.executor = Executors.newFixedThreadPool(maxSimultaneousJobs);
 		running = true;
 	}
@@ -68,7 +68,7 @@ public class NuberRegion {
 		Callable<BookingResult> task = ()->{
 			return newBooking.call();
 		};
-		return executor.submit(task);
+		return executor.submit(task);// Submit the task to an executor
 	}
 	
 	/**

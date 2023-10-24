@@ -65,14 +65,14 @@ public class Booking {
 	 * @return A BookingResult containing the final information about the booking 
 	 */
 	public BookingResult call() {
-		Driver driver = dispatch.getDriver();
+		Driver driver = dispatch.getDriver();// Retrieve a driver from the dispatch
 		this.driverName = driver.name;
 		Long triptime = null;
-		try{driver.pickUpPassenger(passenger);
+		try{driver.pickUpPassenger(passenger);// Call the driveToDestination() method of the driver to sleep the thread
 		driver.driveToDestination();
 		LocalDateTime lastTime = LocalDateTime.now();
 		dispatch.addDriver(driver);
-		triptime = Duration.between(creationTime,lastTime).getSeconds();
+		triptime = Duration.between(creationTime,lastTime).getSeconds(); // Calculate the trip duration in seconds
 		}
 		catch(InterruptedException e){}
 		return new BookingResult(bookingID.intValue(),passenger,driver,triptime);
