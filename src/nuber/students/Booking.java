@@ -1,4 +1,8 @@
 package nuber.students;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 
@@ -61,7 +65,17 @@ public class Booking {
 	 * @return A BookingResult containing the final information about the booking 
 	 */
 	public BookingResult call() {
-
+		Driver driver = dispatch.getDriver();
+		this.driverName = driver.name;
+		Long triptime = null;
+		try{driver.pickUpPassenger(passenger);
+		driver.driveToDestination();
+		LocalDateTime lastTime = LocalDateTime.now();
+		dispatch.addDriver(driver);
+		triptime = Duration.between(creationTime,lastTime).getSeconds();
+		}
+		catch(InterruptedException e){}
+		return new BookingResult(bookingID.intValue(),passenger,driver,triptime);
 	}
 	
 	/***

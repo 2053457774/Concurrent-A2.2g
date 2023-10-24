@@ -57,7 +57,16 @@ public class NuberRegion {
 	 */
 	public Future<BookingResult> bookPassenger(Passenger waitingPassenger)
 	{		
-		
+		if (!running) {
+			System.out.println("region " + regionName + ": reject booking of " + waitingPassenger.name);
+			return null;
+		}
+
+		Booking newBooking = new Booking(this.dispatch,waitingPassenger);
+		Callable<BookingResult> task = ()->{
+			return newBooking.call();
+		};
+		return executor.submit(task);
 	}
 	
 	/**
@@ -65,6 +74,8 @@ public class NuberRegion {
 	 */
 	public void shutdown()
 	{
+		running = false;
+		executor.shutdown();
 	}
 		
 }
