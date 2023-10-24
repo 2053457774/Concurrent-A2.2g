@@ -1,11 +1,15 @@
 package nuber.students;
 
 import java.util.HashMap;
-import java.util.concurrent.Future;
 import java.util.Map;
 import java.util.Queue;
 import java.util.LinkedList;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
 /**
  * The core Dispatch class that instantiates and manages everything for Nuber
  * 
@@ -20,6 +24,15 @@ public class NuberDispatch {
 	private final int MAX_DRIVERS = 999;
 	
 	private boolean logEvents = false;
+
+	HashMap<String,Integer> regionInfo;
+	HashMap<String,NuberRegion> regionTable;
+	private Queue<Driver> idleDrivers;
+	private Lock lock;
+	private Condition producerCondition;
+	private Condition consumerCondition;
+	//represent the numbers of bookings waiting for drivers.
+	private AtomicLong AwaitingBooks;
 	
 	/**
 	 * Creates a new dispatch objects and instantiates the required regions and any other objects required.
@@ -39,6 +52,11 @@ public class NuberDispatch {
 			regionTable.put(regionName,region);
 		}
 		idleDrivers = new LinkedList<>();
+		lock = new ReentrantLock();
+		producerCondition = lock.newCondition();
+		consumerCondition = lock.newCondition();
+		AwaitingBooks = new AtomicLong(0);
+		
 		this.logEvents = logEvents;
 	}
 	

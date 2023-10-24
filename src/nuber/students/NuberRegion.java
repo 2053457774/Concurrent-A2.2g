@@ -29,12 +29,19 @@ public class NuberRegion {
 	 * @param regionName The regions name, unique for the dispatch instance
 	 * @param maxSimultaneousJobs The maximum number of simultaneous bookings the region is allowed to process
 	 */
+	private NuberDispatch dispatch;
+	private String regionName;
+	private int maxSimultaneousJobs;
+	private ExecutorService executor;
+	private boolean running;
 	public NuberRegion(NuberDispatch dispatch, String regionName, int maxSimultaneousJobs)
 	{
 		this.dispatch = dispatch;
 		this.regionName = regionName;
 		this.maxSimultaneousJobs = maxSimultaneousJobs;
 
+		this.executor = Executors.newFixedThreadPool(maxSimultaneousJobs);
+		running = true;
 	}
 	
 	/**

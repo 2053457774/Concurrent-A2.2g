@@ -34,11 +34,14 @@ public class Booking {
 	private Long bookingID;
 
 	private LocalDateTime creationTime;
+	private static AtomicLong jobIdCounter = new AtomicLong(0);
 	String driverName = null;
 	public Booking(NuberDispatch dispatch, Passenger passenger)
 	{
 		this.dispatch = dispatch;
 		this.passenger = passenger;
+		this.bookingID = jobIdCounter.incrementAndGet();
+		this.creationTime = LocalDateTime.now();
 	}
 	
 	/**
@@ -74,6 +77,9 @@ public class Booking {
 	@Override
 	public String toString()
 	{
+		String driverName = this.driverName;
+		String passName = this.passenger.name;
+		return this.bookingID + ":" + driverName + ":" + passName;
 	}
 
 }
