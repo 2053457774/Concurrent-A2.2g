@@ -2,8 +2,7 @@ package nuber.students;
 import java.util.Random;
 
 public class Driver extends Person {
-
-	
+	Passenger curPassenger;
 	public Driver(String driverName, int maxSleep)
 	{
 		super(driverName,maxSleep);
@@ -16,7 +15,7 @@ public class Driver extends Person {
 	 * @param newPassenger Passenger to collect
 	 * @throws InterruptedException
 	 */
-	public void pickUpPassenger(Passenger newPassenger)
+	public void pickUpPassenger(Passenger newPassenger) throws InterruptedException
 	{
 		curPassenger = newPassenger;
 		//sleep while picking up passenger
@@ -29,7 +28,7 @@ public class Driver extends Person {
 	 * 
 	 * @throws InterruptedException
 	 */
-	public void driveToDestination() {
+	public void driveToDestination() throws InterruptedException{
 		int travelTime = curPassenger.getTravelTime();
 		Thread.sleep(travelTime);
 	}

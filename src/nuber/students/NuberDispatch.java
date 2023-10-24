@@ -70,8 +70,13 @@ public class NuberDispatch {
 	 */
 	public boolean addDriver(Driver newDriver)
 	{
+		lock.lock();
 		boolean flag = true;
 		flag = idleDrivers.offer(newDriver);
+
+		// Signal the consumer that an item is available
+		consumerCondition.signal();
+		lock.unlock();
 		return flag;
 	}
 	
@@ -85,7 +90,20 @@ public class NuberDispatch {
 	public Driver getDriver()
 	{
 		Driver driver = null;
-		driver = driver =  idleDrivers.poll();
+		lock.lock();
+		try {
+			AwaitingBooks.getAndIncrement();
+			while (idleDrivers.isEmpty()) {
+				consumerCondition.await();
+			}
+			// Consume an item from the buffer
+			AwaitingBooks.getAndDecrement();
+			driver =  idleDrivers.poll();
+			// Signal the producer that there is space in the buffer
+		}catch(InterruptedException e){}
+		finally {
+			lock.unlock();
+		}
 		return driver;
 	}
 
@@ -117,6 +135,9 @@ public class NuberDispatch {
 	 * @return returns a Future<BookingResult> object
 	 */
 	public Future<BookingResult> bookPassenger(Passenger passenger, String region) {
+		NuberRegion givenRegion = regionTable.get(region);
+//		System.out.println(NuberDispatch);
+		return givenRegion.bookPassenger(passenger);
 	}
 
 	/**
@@ -128,12 +149,16 @@ public class NuberDispatch {
 	 */
 	public int getBookingsAwaitingDriver()
 	{
+		return AwaitingBooks.intValue();
 	}
 	
 	/**
 	 * Tells all regions to finish existing bookings already allocated, and stop accepting new bookings
 	 */
 	public void shutdown() {
+		for (var region : regionTable.values()) {
+			region.shutdown();
+		}
 	}
 
 }
